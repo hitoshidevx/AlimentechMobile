@@ -93,7 +93,7 @@ const Home = ({ navigation }) => {
               alignSelf: 'center',
               borderRadius: 10,
             }}
-            onPress={() => navigation.navigate('Cadastro')}>
+            onPress={() => navigation.navigate('Auth')}>
             <Text
               style={{
                 color: 'white',
@@ -115,7 +115,7 @@ const Home = ({ navigation }) => {
 const Form = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const openAiKey = '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'; 
+  const openAiKey = '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'; 
   const orgId = 'org-qWI37OoJXtQX1t9w5FhJ8eRj';
 
   const handleAskQuestion = async () => {
@@ -210,22 +210,34 @@ const Form = () => {
 };
 
 export default function App() {
-  
-const Cadastro = ({ navigation }) => {
 
+
+  const Auth = ({ navigation }) => {
+
+    
   const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [listaProdutos, setListaProdutos] = useState([]);
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const [listaUsuarios, setListaUsuarios] = useState([]);
+    const [usuarioLogado, setUsuarioLogado] = useState();
+    
 
-  const gravar = (obj) => {
-    const lista = [...listaProdutos, obj];
-    setListaProdutos(lista);
-    AsyncStorage.setItem(usuarioLogado, JSON.stringify(lista));
-  };
+    useEffect( ()=> {  
+      AsyncStorage.getItem("USUARIOS")
+      .then((info)=>{
+        if (!info) {
+          setListaUsuarios([])
+        } else { 
+          setListaUsuarios(JSON.parse(info))
+        }
+      })
+      .catch((err)=>{
+        alert("Erro ao ler a lista de usuarios: ", err)
+      })
+    }, [])
 
-  return(
-    <View style={{ flex: 1 }}>
+    return(
+      <View style={{ flex: 1 }}>
 
       <View
         style={{
@@ -250,7 +262,7 @@ const Cadastro = ({ navigation }) => {
               fontSize: 30,
             }}>
             {' '}
-            Cadastro{' '}
+            Auth{' '}
           </Text>
 
           <TextInput
@@ -305,113 +317,28 @@ const Cadastro = ({ navigation }) => {
               padding: 10,
               alignSelf: 'center',
               borderRadius: 10,
-            }}>
+            }} >
             <Text
               style={{
                 color: 'white',
                 textAlign: 'center',
                 fontWeight: 600,
                 fontSize: 25,
+              }}
+              onPress={()=>{
+                const obj = {email, senha} 
+                const lista = [...listaUsuarios, obj]
+                setListaUsuarios(lista)
+                AsyncStorage.setItem("USUARIOS", JSON.stringify(lista))
+                .then((info)=>{alert("Usuario registrado com sucesso " + info)})
+                .catch((err)=>{alert("Erro: " + err)})
+                
               }}>
               Cadastrar
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={{ color: 'white', textAlign: 'center' }}>
-              {' '}
-              Já tem cadastro? Faça login{' '}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <Footer />
-    </View>
-  )
-}
-
-const Login = ({ navigation }) => {
-
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [usuarioLogado, setUsuarioLogado] = useState();
-  const [listaUsuarios, setListaUsuarios] = useState([]);
-  const [listaProdutos, setListaProdutos] = useState([]);
-
-  const gravar = (obj) => {
-    const lista = [...listaProdutos, obj];
-    setListaProdutos(lista);
-    AsyncStorage.setItem(usuarioLogado, JSON.stringify(lista));
-  };
-
-  useEffect(() => {
-    AsyncStorage.getItem('USUARIO').then((info) => {
-      if (!info) {
-        alert('Faça seu registro por favor');
-        setListaUsuarios([]);
-      } else {
-        setListaUsuarios(JSON.parse(info));
-      }
-    });
-  }, []);
-
-  return(
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          flex: 8,
-          backgroundColor: '#007047',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <View
-          style={{
-            flex: 0.8,
-            backgroundColor: '#0FA971',
-            justifyContent: 'space-evenly',
-            padding: 20,
-            width: '100%',
-          }}>
-          <Text
-            style={{
-              textAlign: 'center',
-              color: '#FFFFFF',
-              fontWeight: 700,
-              fontSize: 30,
-            }}>
-            {' '}
-            Login{' '}
-          </Text>
-
-          <TextInput
-            style={{
-              backgroundColor: '#007047',
-              borderRadius: 10,
-              color: '#FFFFFF',
-              textAlign: 'center',
-              height: '10%',
-              width: '60%',
-              alignSelf: 'center',
-            }}
-            placeholder="Insira seu e-mail..."
-            value={email}
-            onChangeText={setEmail}
-          />
-
-          <TextInput
-            style={{
-              backgroundColor: '#007047',
-              borderRadius: 10,
-              color: '#FFFFFF',
-              textAlign: 'center',
-              height: '10%',
-              width: '60%',
-              alignSelf: 'center',
-            }}
-            placeholder="Insira sua senha..."
-            value={senha}
-            onChangeText={setSenha}
-          />
+          <Text style={{color: "white", textAlign: "center"}}>Ou</Text>
 
           <TouchableOpacity
             style={{
@@ -421,27 +348,23 @@ const Login = ({ navigation }) => {
               alignSelf: 'center',
               borderRadius: 10,
             }}
-            onPress={() => {
-              let achou = false;
+            onPress={()=>{
+              let achou = false
+              console.log(listaUsuarios[0].senha)
               for (let i = 0; i < listaUsuarios.length; i++) {
                 const item = listaUsuarios[i];
-                if (email === item.email && senha === item.senha) {
-                  alert('Login efetuado com sucesso');
-                  setUsuarioLogado(email);
-                  setListaProdutos([]);
-                  AsyncStorage.getItem(email).then((info) => {
-                    if (info) {
-                      setListaProdutos(JSON.parse(info));
-                    }
-                  });
-                  achou = true;
-                  break;
+                if (item.email == email 
+                    && item.senha == senha) {
+                      setUsuarioLogado(email)
+                      navigation.navigate("Formulario")
+                      achou = true;
+                      break;
                 }
               }
-              if (!achou) {
-                alert('Usuario ou senha incorreto');
+              if (!achou) { 
+                alert("Usuario ou senha estao incorretos")
               }
-            }}>
+            }} >
             <Text
               style={{
                 color: 'white',
@@ -452,19 +375,13 @@ const Login = ({ navigation }) => {
               Login
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
-            <Text style={{ color: 'white', textAlign: 'center' }}>
-              {' '}
-              Ainda não tem cadastro? Cadastre-se!{' '}
-            </Text>
-          </TouchableOpacity>
+          
         </View>
       </View>
       <Footer />
     </View>
-  )
-}
+    )
+  }
 
   return (
     <NavigationContainer>
@@ -475,25 +392,8 @@ const Login = ({ navigation }) => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Cadastro"
-          component={Cadastro}
-          options={{
-            title: 'Alimentech',
-            headerStyle: {
-              backgroundColor: '#FF8412',
-              height: 120
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontSize: 30,
-              fontWeight: 700,
-            },
-            headerTitleAlign: 'center',
-          }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
+          name="Auth"
+          component={Auth}
           options={{
             title: 'Alimentech',
             headerStyle: {

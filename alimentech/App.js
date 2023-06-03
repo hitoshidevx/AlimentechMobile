@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput, Alert, Touchable } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 
@@ -62,7 +63,7 @@ const Home = ({ navigation }) => {
             flex: 0.8,
             backgroundColor: '#0FA971',
             justifyContent: 'space-evenly',
-            padding: 20,
+            padding: 30,
           }}>
           <Text
             style={{
@@ -92,7 +93,7 @@ const Home = ({ navigation }) => {
               alignSelf: 'center',
               borderRadius: 10,
             }}
-            onPress={() => navigation.navigate('Formulario')}>
+            onPress={() => navigation.navigate('Cadastro')}>
             <Text
               style={{
                 color: 'white',
@@ -110,10 +111,11 @@ const Home = ({ navigation }) => {
   );
 };
 
+
 const Form = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const openAiKey = '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'; // Substitua com a sua chave de API do GPT-3.5
+  const openAiKey = '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'; 
   const orgId = 'org-qWI37OoJXtQX1t9w5FhJ8eRj';
 
   const handleAskQuestion = async () => {
@@ -121,9 +123,9 @@ const Form = () => {
       const response = await axios.post(
         'https://api.openai.com/v1/engines/davinci/completions',
         {
-          prompt: `Chatgpt, preciso que você me ajude com o plantio autônomo. ${question}`,
-          max_tokens: 300,
-          temperature: 0.1,
+          prompt: `${question}`,
+          max_tokens: 200,
+          temperature: 0,
         },
         {
           headers: {
@@ -208,6 +210,262 @@ const Form = () => {
 };
 
 export default function App() {
+  
+const Cadastro = ({ navigation }) => {
+
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [listaProdutos, setListaProdutos] = useState([]);
+
+  const gravar = (obj) => {
+    const lista = [...listaProdutos, obj];
+    setListaProdutos(lista);
+    AsyncStorage.setItem(usuarioLogado, JSON.stringify(lista));
+  };
+
+  return(
+    <View style={{ flex: 1 }}>
+
+      <View
+        style={{
+          flex: 8,
+          backgroundColor: '#007047',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <View
+          style={{
+            flex: 0.8,
+            backgroundColor: '#0FA971',
+            justifyContent: 'space-evenly',
+            padding: 20,
+            width: '100%',
+          }}>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: '#FFFFFF',
+              fontWeight: 700,
+              fontSize: 30,
+            }}>
+            {' '}
+            Cadastro{' '}
+          </Text>
+
+          <TextInput
+            style={{
+              backgroundColor: '#007047',
+              borderRadius: 10,
+              color: '#FFFFFF',
+              textAlign: 'center',
+              height: '10%',
+              width: '60%',
+              alignSelf: 'center',
+            }}
+            placeholder="Insira seu nome..."
+            value={nome}
+            onChangeText={setNome}
+          />
+
+          <TextInput
+            style={{
+              backgroundColor: '#007047',
+              borderRadius: 10,
+              color: '#FFFFFF',
+              textAlign: 'center',
+              height: '10%',
+              width: '60%',
+              alignSelf: 'center',
+            }}
+            placeholder="Insira seu e-mail..."
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <TextInput
+            style={{
+              backgroundColor: '#007047',
+              borderRadius: 10,
+              color: '#FFFFFF',
+              textAlign: 'center',
+              height: '10%',
+              width: '60%',
+              alignSelf: 'center',
+            }}
+            placeholder="Insira sua senha..."
+            value={senha}
+            onChangeText={setSenha}
+          />
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#9E642E',
+              width: '60%',
+              padding: 10,
+              alignSelf: 'center',
+              borderRadius: 10,
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                textAlign: 'center',
+                fontWeight: 600,
+                fontSize: 25,
+              }}>
+              Cadastrar
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={{ color: 'white', textAlign: 'center' }}>
+              {' '}
+              Já tem cadastro? Faça login{' '}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Footer />
+    </View>
+  )
+}
+
+const Login = ({ navigation }) => {
+
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [usuarioLogado, setUsuarioLogado] = useState();
+  const [listaUsuarios, setListaUsuarios] = useState([]);
+  const [listaProdutos, setListaProdutos] = useState([]);
+
+  const gravar = (obj) => {
+    const lista = [...listaProdutos, obj];
+    setListaProdutos(lista);
+    AsyncStorage.setItem(usuarioLogado, JSON.stringify(lista));
+  };
+
+  useEffect(() => {
+    AsyncStorage.getItem('USUARIO').then((info) => {
+      if (!info) {
+        alert('Faça seu registro por favor');
+        setListaUsuarios([]);
+      } else {
+        setListaUsuarios(JSON.parse(info));
+      }
+    });
+  }, []);
+
+  return(
+    <View style={{ flex: 1 }}>
+      <View
+        style={{
+          flex: 8,
+          backgroundColor: '#007047',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <View
+          style={{
+            flex: 0.8,
+            backgroundColor: '#0FA971',
+            justifyContent: 'space-evenly',
+            padding: 20,
+            width: '100%',
+          }}>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: '#FFFFFF',
+              fontWeight: 700,
+              fontSize: 30,
+            }}>
+            {' '}
+            Login{' '}
+          </Text>
+
+          <TextInput
+            style={{
+              backgroundColor: '#007047',
+              borderRadius: 10,
+              color: '#FFFFFF',
+              textAlign: 'center',
+              height: '10%',
+              width: '60%',
+              alignSelf: 'center',
+            }}
+            placeholder="Insira seu e-mail..."
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <TextInput
+            style={{
+              backgroundColor: '#007047',
+              borderRadius: 10,
+              color: '#FFFFFF',
+              textAlign: 'center',
+              height: '10%',
+              width: '60%',
+              alignSelf: 'center',
+            }}
+            placeholder="Insira sua senha..."
+            value={senha}
+            onChangeText={setSenha}
+          />
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#9E642E',
+              width: '60%',
+              padding: 10,
+              alignSelf: 'center',
+              borderRadius: 10,
+            }}
+            onPress={() => {
+              let achou = false;
+              for (let i = 0; i < listaUsuarios.length; i++) {
+                const item = listaUsuarios[i];
+                if (email === item.email && senha === item.senha) {
+                  alert('Login efetuado com sucesso');
+                  setUsuarioLogado(email);
+                  setListaProdutos([]);
+                  AsyncStorage.getItem(email).then((info) => {
+                    if (info) {
+                      setListaProdutos(JSON.parse(info));
+                    }
+                  });
+                  achou = true;
+                  break;
+                }
+              }
+              if (!achou) {
+                alert('Usuario ou senha incorreto');
+              }
+            }}>
+            <Text
+              style={{
+                color: 'white',
+                textAlign: 'center',
+                fontWeight: 600,
+                fontSize: 25,
+              }}>
+              Login
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Cadastro')}>
+            <Text style={{ color: 'white', textAlign: 'center' }}>
+              {' '}
+              Ainda não tem cadastro? Cadastre-se!{' '}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Footer />
+    </View>
+  )
+}
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -217,12 +475,47 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="Cadastro"
+          component={Cadastro}
+          options={{
+            title: 'Alimentech',
+            headerStyle: {
+              backgroundColor: '#FF8412',
+              height: 120
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontSize: 30,
+              fontWeight: 700,
+            },
+            headerTitleAlign: 'center',
+          }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{
+            title: 'Alimentech',
+            headerStyle: {
+              backgroundColor: '#FF8412',
+              height: 120
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontSize: 30,
+              fontWeight: 700,
+            },
+            headerTitleAlign: 'center',
+          }}
+        />
+        <Stack.Screen
           name="Formulario"
           component={Form}
           options={{
             title: 'Alimentech',
             headerStyle: {
               backgroundColor: '#FF8412',
+              height: 120
             },
             headerTintColor: '#fff',
             headerTitleStyle: {

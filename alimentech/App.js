@@ -115,29 +115,30 @@ const Home = ({ navigation }) => {
 const Form = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
-  const openAiKey = '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'; 
+  const openAiKey = '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'; 
   const orgId = 'org-qWI37OoJXtQX1t9w5FhJ8eRj';
 
   const handleAskQuestion = async () => {
     try {
       const response = await axios.post(
-        'https://api.openai.com/v1/engines/davinci/completions',
+        'https://api.openai.com/v1/chat/completions',
         {
-          prompt: `${question}`,
-          max_tokens: 200,
-          temperature: 0,
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: 'system', content: 'Você é um assistente que dá dicas sobre plantio para consumo próprio. Lembre-se de fornecer informações sobre técnicas de agricultura sustentável, como agricultura vertical, aquaponia' },
+            { role: 'user', content: question }
+          ]
         },
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${openAiKey}`,
-            'OpenAI-Organization': `${orgId}`,
+            Authorization: `Bearer ${openAiKey}`
           },
         }
-      );
+      )
 
       if (response.data.choices && response.data.choices.length > 0) {
-        setAnswer(response.data.choices[0].text);
+        setAnswer(response.data.choices[0].message.content);
       } else {
         setAnswer('Não foi possível obter uma resposta do modelo.');
       }
@@ -198,8 +199,8 @@ const Form = () => {
           </TouchableOpacity>
           </View>
 
-          <ScrollView style={{flex: 1, backgroundColor: "#007047", padding: 30, borderRadius: 10, marginTop: 100 }}>
-            <Text style={{color: "white", fontSize: 20, fontWeight: 500, textAlign: "center"}}>{answer}</Text>
+          <ScrollView style={{flex: 1, backgroundColor: "#007047", padding: 20, borderRadius: 10, marginTop: 100 }}>
+            <Text style={{color: "white", fontSize: 20, fontWeight: 500, textAlign: "center", marginBottom: 30}}>{answer}</Text>
           </ScrollView>
         </View>
       </View>
@@ -215,7 +216,7 @@ export default function App() {
   const Auth = ({ navigation }) => {
 
     
-  const [nome, setNome] = useState('');
+    const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
     const [listaUsuarios, setListaUsuarios] = useState([]);
@@ -306,6 +307,7 @@ export default function App() {
               alignSelf: 'center',
             }}
             placeholder="Insira sua senha..."
+            secureTextEntry={true}
             value={senha}
             onChangeText={setSenha}
           />
@@ -355,7 +357,7 @@ export default function App() {
                 const item = listaUsuarios[i];
                 if (item.email == email 
                     && item.senha == senha) {
-                      setUsuarioLogado(email)
+                      setUsuarioLogado(nome)
                       navigation.navigate("Formulario")
                       achou = true;
                       break;

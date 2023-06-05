@@ -112,11 +112,17 @@ const Home = ({ navigation }) => {
 };
 
 
-const Form = () => {
-  const [question, setQuestion] = useState('');
+const Form = ({navigation}) => {
+  const [area, setArea] = useState('')
+  const [regiao, setRegiao] = useState('')
+  const [tempoEspera, setTempoEspera] = useState('')
+  const [recursos, setRecursos] = useState('')
+
+  const question = `Eu possuo uma área de ${area}m² para plantio, moro na região de ${regiao}, consigo esperar ${tempoEspera} até a colheita e tenho os seguintes recursos: ${recursos}`
+
   const [answer, setAnswer] = useState('');
-  const openAiKey = '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'; 
-  const orgId = 'org-qWI37OoJXtQX1t9w5FhJ8eRj';
+
+  const openAiKey = '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'; 
 
   const handleAskQuestion = async () => {
     try {
@@ -125,7 +131,7 @@ const Form = () => {
         {
           model: "gpt-3.5-turbo",
           messages: [
-            { role: 'system', content: 'Você é um assistente que dá dicas sobre plantio para consumo próprio. Lembre-se de fornecer informações sobre técnicas de agricultura sustentável, como agricultura vertical, aquaponia' },
+            { role: 'system', content: `'Você é um assistente que dá dicas sobre plantio para consumo próprio. Lembre-se de fornecer informações sobre técnicas de agricultura sustentável, como agricultura vertical, aquaponia` },
             { role: 'user', content: question }
           ]
         },
@@ -139,6 +145,7 @@ const Form = () => {
 
       if (response.data.choices && response.data.choices.length > 0) {
         setAnswer(response.data.choices[0].message.content);
+        navigation.navigate("ResponseFormulario", { answer: answer });
       } else {
         setAnswer('Não foi possível obter uma resposta do modelo.');
       }
@@ -153,10 +160,16 @@ const Form = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View
-        style={{ flex: 8, backgroundColor: '#0FA971', alignItems: 'center', padding: 20 }}>
-        <View style={{ flex: 1, justifyContent: "space-evenly", marginBottom: 30, marginTop: 30}}>
+      <ScrollView
+        style={{ flex: 8, backgroundColor: '#0FA971' }}>
+  
+        <View style={{backgroundColor: "#0A4630", padding: 20}}>
+              <Text style={{color: "white", textAlign: "center", fontWeight: 600, fontSize: 25, marginBottom: 30, opacity: 0.6}}>Para tornar as dicas mais específicas, precisamos que você nos forneça algumas informações</Text>
+            </View>
+        <View style={{ flex: 1, justifyContent: "space-evenly", marginBottom: 30, marginTop: 30, padding: 20}}>
+          
           <View style={{flex: 1}}>
+            
             <View
               style={{
                 backgroundColor: '#007047',
@@ -171,7 +184,7 @@ const Form = () => {
                   textAlign: 'center',
                   fontWeight: 600,
                 }}>
-                Por favor, descreva sua área de plantio
+                Descreva sua área de plantio em m².
               </Text>
             </View>
             <TextInput
@@ -185,8 +198,104 @@ const Form = () => {
                 borderBottomLeftRadius: 10,
                 marginBottom: 30
               }}
-              value={question}
-              onChangeText={setQuestion}
+              value={area}
+              onChangeText={setArea}
+            />
+
+            <View
+              style={{
+                backgroundColor: '#007047',
+                padding: 30,
+                borderTopLeftRadius: 10,
+                borderTopRightRadius: 10,
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 20,
+                  textAlign: 'center',
+                  fontWeight: 600,
+                }}>
+                Onde você mora?
+              </Text>
+            </View>
+            <TextInput
+              placeholder="Digite aqui..."
+              style={{
+                backgroundColor: '#0A4630',
+                color: 'white',
+                padding: 20,
+                textAlign: 'center',
+                borderBottomRightRadius: 10,
+                borderBottomLeftRadius: 10,
+                marginBottom: 30
+              }}
+              value={regiao}
+              onChangeText={setRegiao}
+            />
+
+            <View
+              style={{
+                backgroundColor: '#007047',
+                padding: 30,
+                borderTopLeftRadius: 10,
+                borderTopRightRadius: 10,
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 20,
+                  textAlign: 'center',
+                  fontWeight: 600,
+                }}>
+                Quanto tempo você consegue esperar até a colheita?
+              </Text>
+            </View>
+            <TextInput
+              placeholder="Digite aqui..."
+              style={{
+                backgroundColor: '#0A4630',
+                color: 'white',
+                padding: 20,
+                textAlign: 'center',
+                borderBottomRightRadius: 10,
+                borderBottomLeftRadius: 10,
+                marginBottom: 30
+              }}
+              value={tempoEspera}
+              onChangeText={setTempoEspera}
+            />
+
+            <View
+              style={{
+                backgroundColor: '#007047',
+                padding: 30,
+                borderTopLeftRadius: 10,
+                borderTopRightRadius: 10,
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 20,
+                  textAlign: 'center',
+                  fontWeight: 600,
+                }}>
+                Quais recursos você tem disponível?
+              </Text>
+            </View>
+            <TextInput
+              placeholder="Digite aqui..."
+              style={{
+                backgroundColor: '#0A4630',
+                color: 'white',
+                padding: 20,
+                textAlign: 'center',
+                borderBottomRightRadius: 10,
+                borderBottomLeftRadius: 10,
+                marginBottom: 30
+              }}
+              value={recursos}
+              onChangeText={setRecursos}
             />
             
 
@@ -198,17 +307,30 @@ const Form = () => {
             <Text style={{color: "white", fontSize: 20, textAlign: "center", fontWeight: 600}}>Pronto!</Text>
           </TouchableOpacity>
           </View>
-
-          <ScrollView style={{flex: 1, backgroundColor: "#007047", padding: 20, borderRadius: 10, marginTop: 100 }}>
-            <Text style={{color: "white", fontSize: 20, fontWeight: 500, textAlign: "center", marginBottom: 30}}>{answer}</Text>
-          </ScrollView>
+          
         </View>
-      </View>
-
-      <Footer />
+      </ScrollView>
     </View>
   );
 };
+
+const ResponseForm = ({ navigation, route }) => {
+  const { answer } = route.params;
+
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={{flex: 0.4, justifyContent: "center", alignItems: "center", backgroundColor: "#0A4630"}}>
+          <Text style={{fontSize: 30, fontWeight: 600, textAlign: "center"}}>Dicas para uma boa colheita :)</Text>
+      </View>
+      <View style={{flex: 1, backgroundColor: "#007047", padding: 30}}>
+          <ScrollView
+              style={{ backgroundColor: '#0F855B', padding: 30, borderRadius: 20 }}>
+                <Text style={{textAlign: "center", fontSize: 20, fontWeight: 500, marginBottom: 50}}>{answer}</Text>
+          </ScrollView>
+      </View>
+  </View>
+  );
+}
 
 export default function App() {
 
@@ -332,7 +454,7 @@ export default function App() {
                 const lista = [...listaUsuarios, obj]
                 setListaUsuarios(lista)
                 AsyncStorage.setItem("USUARIOS", JSON.stringify(lista))
-                .then((info)=>{alert("Usuario registrado com sucesso " + info)})
+                .then((info)=>{alert("Usuario registrado com sucesso! :D")})
                 .catch((err)=>{alert("Erro: " + err)})
                 
               }}>
@@ -413,6 +535,23 @@ export default function App() {
         <Stack.Screen
           name="Formulario"
           component={Form}
+          options={{
+            title: 'Alimentech',
+            headerStyle: {
+              backgroundColor: '#FF8412',
+              height: 120
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontSize: 30,
+              fontWeight: 700,
+            },
+            headerTitleAlign: 'center',
+          }}
+        />
+        <Stack.Screen
+          name="ResponseFormulario"
+          component={ResponseForm}
           options={{
             title: 'Alimentech',
             headerStyle: {

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, Touchable } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import * as Animatable from 'react-native-animatable';
+
+import axios from 'axios';
 
 const Stack = createStackNavigator();
 
@@ -117,15 +120,22 @@ const Form = ({navigation}) => {
   const [regiao, setRegiao] = useState('')
   const [tempoEspera, setTempoEspera] = useState('')
   const [recursos, setRecursos] = useState('')
+  const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(false)
+  const openAiKey = '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'; 
 
   const question = `Eu possuo uma área de ${area}m² para plantio, moro na região de ${regiao}, consigo esperar ${tempoEspera} até a colheita e tenho os seguintes recursos: ${recursos}`
 
-  const [answer, setAnswer] = useState('');
-
-  const openAiKey = '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'; 
+  useEffect(() => {
+    if (answer) {
+      setLoading(false); 
+      navigation.navigate('ResponseFormulario', { answer: answer });
+    }
+  }, [answer, navigation]);
 
   const handleAskQuestion = async () => {
     try {
+      setLoading(true)
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
@@ -145,7 +155,6 @@ const Form = ({navigation}) => {
 
       if (response.data.choices && response.data.choices.length > 0) {
         setAnswer(response.data.choices[0].message.content);
-        navigation.navigate("ResponseFormulario", { answer: answer });
       } else {
         setAnswer('Não foi possível obter uma resposta do modelo.');
       }
@@ -155,6 +164,8 @@ const Form = ({navigation}) => {
         'Erro',
         'Ocorreu um erro ao fazer a requisição. Por favor, tente novamente mais tarde.'
       );
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -303,8 +314,16 @@ const Form = ({navigation}) => {
               backgroundColor: '#9E642E',
               padding: 20,
               borderRadius: 10}} 
-              onPress={handleAskQuestion}>
-            <Text style={{color: "white", fontSize: 20, textAlign: "center", fontWeight: 600}}>Pronto!</Text>
+              onPress={handleAskQuestion}
+              disabled={loading}
+              >
+            {loading 
+            ? (
+              <ActivityIndicator color="white" />
+            ) 
+            : (
+              <Text style={{ color: 'white', fontSize: 20, textAlign: "center" }}>Pronto</Text>
+            )}
           </TouchableOpacity>
           </View>
           
@@ -316,6 +335,7 @@ const Form = ({navigation}) => {
 
 const ResponseForm = ({ navigation, route }) => {
   const { answer } = route.params;
+  console.log(answer)
 
   return (
     <View style={{ flex: 1 }}>

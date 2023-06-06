@@ -122,7 +122,7 @@ const Form = ({navigation}) => {
   const [recursos, setRecursos] = useState('')
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false)
-  const openAiKey = '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'; 
+  const openAiKey = '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'; 
 
   const question = `Eu possuo uma área de ${area}m² para plantio, moro na região de ${regiao}, consigo esperar ${tempoEspera} até a colheita e tenho os seguintes recursos: ${recursos}`
 
@@ -494,7 +494,6 @@ export default function App() {
             }}
             onPress={()=>{
               let achou = false
-              console.log(listaUsuarios[0].senha)
               for (let i = 0; i < listaUsuarios.length; i++) {
                 const item = listaUsuarios[i];
                 if (item.email == email 

@@ -122,6 +122,7 @@ const Form = ({navigation}) => {
   const [recursos, setRecursos] = useState('')
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false)
+  // Para usar o aplicativo, é preciso gerar uma nova chave da OpenAI e substituir essa que está abaixo.
   const openAiKey = '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'; 
 
   const question = `Eu possuo uma área de ${area}m² para plantio, moro na região de ${regiao}, consigo esperar ${tempoEspera} até a colheita e tenho os seguintes recursos: ${recursos}`

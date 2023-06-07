@@ -1,5 +1,7 @@
 # Alimentech
 
+<img src="https://github.com/hitoshidevx/AlimentechMobile/assets/61585229/09cf908b-ebb9-43cf-9c91-3e3272e3ecb1" width="405" height="574"/>
+
 Nosso objetivo é orientar e incentivar pessoas com insegurança alimentar a começar uma pequena agricultura familiar, dando ótimas dicas baseadas no espaço, região, recursos e tempo até a colheita que a pessoa se dispõe a esperar.
 
 ---
